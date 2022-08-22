@@ -7,7 +7,13 @@ header-includes: yes
 
 ## Requerimientos
 
+- Programa en ASM que realice interpolación bilineal sobre un conjunto de pixeles de una imagen blanco y negro.
+- Programa en lenguaje de alto nivel para interactuar con el usuario y mostrar la imagen y el resultado.
+- Integración entre lenguaje de alto nivel y programa ASM que posiblemente corra en emulador.
+
 ## Opciones de solución
+
+### ASM
 
 ### Comparación de opciones
 
