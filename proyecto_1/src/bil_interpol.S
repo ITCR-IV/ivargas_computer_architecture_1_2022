@@ -6,50 +6,50 @@
 
 // PARAM rdi: Pointer to file name to generate
 // PARAM rsi: Pointer to [u8] buffer representing image
-// PARAM rdx: Image height
-// PARAM rcx: Image width
+// PARAM edx: Image height
+// PARAM ecx: Image width
 
 _bil_interpol:
 	push rbp
 	mov rbp, rsp
-	sub rsp, 20
-	mov [rbp - 20], rdi
-	mov [rbp - 16], rsi
-	mov [rbp - 12], rdx
-	mov [rbp -  8], rcx
+	sub rsp, 28
+	mov [rbp - 28], rdi
+	mov [rbp - 20], rsi
+	mov [rbp - 12], edx
+	mov [rbp -  8], ecx
 
-	add rdx, rcx
-	mov [rbp - 4], rdx
+	add edx, ecx
+	mov [rbp - 4], edx
 
-	//mov rdi, 104 // h
-	//call printChar
-	//mov rdi, 43 // +
-	//call printChar
-	//mov rdi, 119 // w
-	//call printChar
-	//mov rdi, 58 // :
-	//call printChar
-	//mov rdi, 32 // espacio
-	//call printChar
-	//mov rdi, [rbp - 4]
-	//add rdi, 48
-	//call printChar
+	mov al, 104 // h
+	call printChar
+	mov al, 43 // +
+	call printChar
+	mov al, 119 // w
+	call printChar
+	mov al, 58 // :
+	call printChar
+	mov al, 32 // espacio
+	call printChar
+	mov al, [rbp - 4]
+	add al, 48
+	call printChar
 
-	//mov rdi, 10 // \n
-	//call printChar
+	mov al, 10 // \n
+	call printChar
 
-	mov rax, [rbp - 4]
+	//mov rax, [rbp - 4]
 
 	leave
 	ret
 
-// PARAM rdi: char to be printed in lower 8 bytes
+// PARAM al: char to be printed
 printChar:
 	push rbp
 	mov rbp, rsp
 
 	sub rsp, 1
-	mov [rsp], rdi
+	mov [rsp], al
 
 	mov rdi, 1        // stdout
 	mov rsi, rsp			// point to char on stack
@@ -57,5 +57,7 @@ printChar:
 	mov rax, 1
 	syscall
 
-	leave
+	mov rsp, rbp
+	pop rbp
+	//leave
 	ret
