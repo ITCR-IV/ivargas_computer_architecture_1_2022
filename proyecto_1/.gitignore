@@ -3,3 +3,6 @@
 
 # directory for testing stuff with C
 C/** 
+
+# img created by assembly
+*.img
