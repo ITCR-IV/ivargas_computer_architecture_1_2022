@@ -1,6 +1,6 @@
-.equ O_TRUNC,		o1000
-.equ O_CREAT,		o0100
-.equ O_WRONLY,	o0001
+//.equ O_TRUNC,		o1000
+//.equ O_CREAT,		o0100
+//.equ O_WRONLY,	o0001
 
 .global _bil_interpol
 
@@ -8,18 +8,17 @@
 // PARAM rsi: Pointer to [u8] buffer representing image
 // PARAM edx: Image height
 // PARAM ecx: Image width
-
 _bil_interpol:
 	push rbp
 	mov rbp, rsp
-	sub rsp, 28
-	mov [rbp - 28], rdi
-	mov [rbp - 20], rsi
-	mov [rbp - 12], edx
-	mov [rbp -  8], ecx
+	sub rsp, 32
+	mov [rbp - 32], rdi
+	mov [rbp - 24], rsi
+	mov [rbp - 16], edx
+	mov [rbp - 12], ecx
 
 	add edx, ecx
-	mov [rbp - 4], edx
+	mov [rbp - 8], edx
 
 	mov al, 104 // h
 	call printChar
@@ -31,16 +30,24 @@ _bil_interpol:
 	call printChar
 	mov al, 32 // espacio
 	call printChar
-	mov al, [rbp - 4]
+	mov al, [rbp - 8]
 	add al, 48
 	call printChar
 
-	mov al, 10 // \n
+	mov al, 0xA // \n
 	call printChar
 
-	//mov rax, [rbp - 4]
+	// Open file
+	mov rdi, [rbp - 32]		// load file name ptr
+	mov rsi, 0b1001000001 // O_TRUNC | O_CREAT | O_WRONLY
+	mov rdx, 0b0110100100 // -rw-r--r-- (permissions in case of creation)
+	mov rax, 2						// sys_open
+	syscall
 
-	leave
+	mov [rbp - 4], eax
+
+	//mov rax, [rbp - 4]
+	leave    
 	ret
 
 // PARAM al: char to be printed
