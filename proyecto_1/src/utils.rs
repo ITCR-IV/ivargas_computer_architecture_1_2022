@@ -2,9 +2,9 @@ use anyhow::{anyhow, Result};
 use image::GrayImage;
 
 /// Transforms GrayImage into a Vec<u32> with ARGB format
-pub fn gray_to_vec32(img: &GrayImage) -> Vec<u32> {
+pub fn gray_to_vec32(img: GrayImage) -> Vec<u32> {
     img.as_raw()
-        .iter()
+        .into_iter()
         .map(|luma| {
             let luma = *luma as u32;
             luma | luma << 8 | luma << 16

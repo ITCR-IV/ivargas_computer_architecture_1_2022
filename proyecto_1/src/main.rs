@@ -41,7 +41,7 @@ fn main() -> Result<()> {
             Event::RedrawRequested(window_id) if window_id == graphics_context.window().id() => {
                 let res_img = resize(&gray_img, width, height, FilterType::Nearest);
 
-                let buffer: Vec<u32> = utils::gray_to_vec32(&res_img);
+                let buffer: Vec<u32> = utils::gray_to_vec32(res_img);
                 let buffer = utils::draw_grid(buffer, width, height, N).unwrap();
 
                 graphics_context.set_buffer(&buffer, width as u16, height as u16);
