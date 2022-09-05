@@ -1,0 +1,7 @@
+[profile.dev-faster]
+inherits = "dev"
+opt-level = 2
+
+[alias]
+rf =  "run --profile=dev-faster"
+rr =  "run --release"

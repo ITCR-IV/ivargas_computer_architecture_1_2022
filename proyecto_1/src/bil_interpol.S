@@ -44,7 +44,7 @@ _bil_interpol:
 	mov rax, 2						// sys_open
 	syscall
 
-	mov [rbp - 4], eax
+	mov [rbp - 8], eax
 
 	//mov rax, [rbp - 4]
 	leave    
