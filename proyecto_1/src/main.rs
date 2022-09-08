@@ -19,8 +19,9 @@ const IMAGE: &str = "input.jpg";
 const N: u32 = 4;
 
 fn main() -> Result<()> {
-    //let mut buf: [u8; 3] = [1, 2, 3];
-    //let sum = interpolation::bil_interpol("result.img", &mut buf, 1, 3);
+    let buf: [u8; 3] = [1, 2, 3];
+    let sum = interpolation::bil_interpol("result.img", &buf, 1, 3);
+    println!("ASM return: {}", sum);
 
     let gray_img: GrayImage = grayscale(&ImageReader::open(IMAGE)?.decode()?);
 

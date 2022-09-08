@@ -21,15 +21,15 @@ int bil_interpol(const char* img, unsigned int h, unsigned int w) {
 	// Primero verticales entre pixeles OG
 	for(int new_r = 0; new_r < new_h; new_r++){
 		for(int c = 0; c < w; c++) {
-			int new_i = c2i(new_r, c*3, new_w);
 			int mod = new_r % 3;
 
 			if(mod == 0) {
-				new_img[new_i] = img[c2i(new_r/3, c, w)];
+				continue;
 			}
 			else {
 				int up_ref = img[c2i(new_r/3, c, w)];
 				int down_ref = img[c2i((new_r + 3)/3, c, w)];
+				int new_i = c2i(new_r, c*3, new_w);
 				new_img[new_i] = ((3-mod) * up_ref + mod * down_ref)/3;
 			}
 		}
@@ -38,7 +38,6 @@ int bil_interpol(const char* img, unsigned int h, unsigned int w) {
 	// Segundo horizontales todos
 	for(int new_r = 0; new_r < new_h; new_r++){
 		for(int new_c = 0; new_c < new_w; new_c++) {
-			int new_i = c2i(new_r, new_c, new_w);
 			int mod = new_c % 3;
 			int inv_mod = 3-mod;
 
@@ -51,6 +50,8 @@ int bil_interpol(const char* img, unsigned int h, unsigned int w) {
 				int right_ref = new_img[c2i(new_r, new_c + inv_mod, new_w)];
 				unsigned int result = ((inv_mod) * left_ref + mod * right_ref)/3;
 
+
+				int new_i = c2i(new_r, new_c, new_w);
 				new_img[new_i] = result;
 			}
 		}
