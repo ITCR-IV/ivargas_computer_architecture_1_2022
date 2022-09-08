@@ -27,6 +27,7 @@ _bil_interpol:
 	// -64 r8 for rows
 	// -72 r9 for columns
 	// -80 r10
+	// -88 Temporarily, return val
 
 	sub rsp, 80
 	mov [rbp - 4], ecx
@@ -56,49 +57,44 @@ _bil_interpol:
 	call malloc
 	mov [rbp - 48], rax
 
-	
-	mov r8, 0
+	mov r8d, 0
 loopOriginalsR:
-	cmp r8, [rbp - 8]
-	jl exitLoopOriginals // rows < r8
+	cmp r8d, [rbp - 8]
+	jge exitLoopOriginals // if r8 >= height, jump 
 
-	mov r9, 0
+	mov r9d, 0
 	loopOriginalsC:
-		cmp r9, [rbp - 4]
-		jl loopOriginalsR
+		cmp r9d, [rbp - 4]
+		jge exitLoopOriginalsC
 
 		mov edi, r9d
 		mov esi, r8d
-		mov edx, [rbp - 4]
+		mov eax, [rbp - 4]
 		call c2i
 
-		add eax, [rbp - 16]
-		mov ecx, [eax]
+		add rax, [rbp - 16]
+		mov ecx, [rax]
 
 		// mul * 3
 		add edi, edi 
 		add edi, edi 
 		add esi, esi 
 		add esi, esi 
-		mov edx, [rbp - 32] // get new_w
+		mov eax, [rbp - 32] // get new_w
 		call c2i
-		add eax, [rbp - 48]
+		add rax, [rbp - 48]
 
-		mov [eax], ecx
+		mov [rax], ecx
 
-		add r9, 1
+		add r9d, 1
 		jmp loopOriginalsC
 		
-	add r8, 1
+		exitLoopOriginalsC:
+
+	add r8d, 1
 	jmp loopOriginalsR
 
 exitLoopOriginals:
-	mov rdi, [rbp - 48]
-	call free
-	
-
-
-
 
 	//// open file
 	//mov rdi, [rbp - 24]		// load file name ptr
@@ -114,6 +110,9 @@ exitLoopOriginals:
 	//syscall
 	//// Ignoring return :/
 
+	mov rdi, [rbp - 48]
+	call free
+
 	// Restore callee-saved registers
 	mov rdi, [rbp - 24]
 	mov rsi, [rbp - 16]
@@ -122,13 +121,14 @@ exitLoopOriginals:
 	mov r10, [rbp - 80]
 
 	mov rax, 0
+	//mov rax, [rbp - 88]
 	leave    
 	ret
 
 // PARAM edi: row (preserved)
 // PARAM esi: col (preserved)
-// PARAM edx: width
-// RETURN eax: coords to index
+// PARAM eax: width
+// RETURN eax: index
 c2i:
 	mul edi
 	add eax, esi
