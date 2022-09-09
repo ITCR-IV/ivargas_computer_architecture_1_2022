@@ -143,16 +143,16 @@ loopVerticalR:
 		// r10d = new_r//3
 		mov r10d, eax
 
-		// Get up_ref into r11d
+		// Get up_ref into r11
 		mov edi, eax
 		mov esi, r9d
 		mov eax, [rbp - 4]
 		call c2i
 
 		add rax, [rbp - 16]
-		mov r11d, [rax]
+		mov r11b, [rax]
 
-		// Get down_ref into r12d
+		// Get down_ref into r12
 		add r10d, 1
 		mov edi, r10d
 		mov esi, r9d
@@ -160,11 +160,10 @@ loopVerticalR:
 		call c2i
 
 		add rax, [rbp - 16]
-		mov r12d, [rax]
+		mov r12b, [rax]
 
 		// Get new_i into r13d
-		sub r10d, 1
-		mov edi, r10d
+		mov edi, r8d
 		mov esi, r9d
 		add esi, r9d
 		add esi, r9d
@@ -232,16 +231,16 @@ loopHorizontalR:
 		mov r10d, r9d
 		sub r10d, [rbp - 36]
 
-		// Get left_ref into r11d
+		// Get left_ref into r11
 		mov edi, r8d
 		mov esi, r10d
 		mov eax, [rbp - 32]
 		call c2i
 
 		add rax, [rbp - 48]
-		mov r11d, [rax]
+		mov r11b, [rax]
 
-		// Get right_ref into r12d
+		// Get right_ref into r12
 		add r10d, 3 // r10d = new_c + mod
 		mov edi, r8d
 		mov esi, r10d
@@ -249,7 +248,7 @@ loopHorizontalR:
 		call c2i
 
 		add rax, [rbp - 48]
-		mov r12d, [rax]
+		mov r12b, [rax]
 
 		// Get new_i into r13d
 		mov edi, r8d
@@ -286,19 +285,31 @@ loopHorizontalR:
 
 exitLoopHorizontal:
 
-	//// open file
-	//mov rdi, [rbp - 24]		// load file name ptr
-	//mov rsi, 0b1001000001 // O_TRUNC | O_CREAT | O_WRONLY
-	//mov rdx, 0b0110100100 // -rw-r--r-- (permissions in case of creation)
-	//mov rax, 2						// sys_open
-	//syscall
-	//mov [rbp - 56], rax
+	// open file
+	mov rdi, [rbp - 24]		// load file name ptr
+	mov rsi, 0b1001000001 // O_TRUNC | O_CREAT | O_WRONLY
+	mov rdx, 0b0110100100 // -rw-r--r-- (permissions in case of creation)
+	mov rax, 2						// sys_open
+	syscall
+	mov [rbp - 56], rax
 
-	//// Close file
-	//mov rdi, [rbp - 56]		// Get file descriptor
-	//mov rax, 3						// sys_close
-	//syscall
-	//// Ignoring return :/
+	// write to file
+	mov eax, [rbp - 28]
+	mov edx, [rbp - 32]
+	mul edx // eax = new_h*new_w
+	mov eax, eax
+	mov rdx, rax // Size of buffer
+
+	mov rdi, [rbp - 56]		// Get file descriptor
+	mov rsi, [rbp - 48]		// Pointer to buffer
+	mov rax, 1						// sys_write
+	syscall
+
+	// Close file
+	mov rdi, [rbp - 56]		// Get file descriptor
+	mov rax, 3						// sys_close
+	syscall
+	// Ignoring return :/
 
 	mov rdi, [rbp - 48]
 	call free
