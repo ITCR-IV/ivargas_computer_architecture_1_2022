@@ -126,7 +126,7 @@ loopVerticalR:
 
 
 		mov edx, 0
-		mov eax, r9d
+		mov eax, r8d
 		mov r15, 3
 		div r15
 
@@ -145,7 +145,7 @@ loopVerticalR:
 
 		// Get up_ref into r11d
 		mov edi, eax
-		mov esi, r8d
+		mov esi, r9d
 		mov eax, [rbp - 4]
 		call c2i
 
@@ -155,7 +155,7 @@ loopVerticalR:
 		// Get down_ref into r12d
 		add r10d, 1
 		mov edi, r10d
-		mov esi, r8d
+		mov esi, r9d
 		mov eax, [rbp - 4]
 		call c2i
 
@@ -165,9 +165,9 @@ loopVerticalR:
 		// Get new_i into r13d
 		sub r10d, 1
 		mov edi, r10d
-		mov esi, r8d
-		add esi, r8d
-		add esi, r8d
+		mov esi, r9d
+		add esi, r9d
+		add esi, r9d
 		mov eax, [rbp - 32]
 		call c2i
 
@@ -199,6 +199,92 @@ loopVerticalR:
 	jmp loopVerticalR
 
 exitLoopVertical:
+
+	mov r8d, 0
+loopHorizontalR:
+	cmp r8d, [rbp - 28]
+	jge exitLoopHorizontal // if r8 >= height, jump 
+
+	mov r9d, 0
+	loopHorizontalC:
+		cmp r9d, [rbp - 32]
+		jge exitLoopHorizontalC
+
+
+		// mod
+		mov edx, 0
+		mov eax, r9d
+		mov r15, 3
+		div r15
+
+		mov [rbp - 36], edx
+
+		// if mod == 0: continue
+		test edx, edx
+		jz continueHorizontalC
+
+		// inv_mod
+		neg edx
+		add edx, 3
+		mov [rbp - 40], edx
+
+		// r10d = new_c - mod
+		mov r10d, r9d
+		sub r10d, [rbp - 36]
+
+		// Get left_ref into r11d
+		mov edi, r8d
+		mov esi, r10d
+		mov eax, [rbp - 32]
+		call c2i
+
+		add rax, [rbp - 48]
+		mov r11d, [rax]
+
+		// Get right_ref into r12d
+		add r10d, 3 // r10d = new_c + mod
+		mov edi, r8d
+		mov esi, r10d
+		mov eax, [rbp - 32]
+		call c2i
+
+		add rax, [rbp - 48]
+		mov r12d, [rax]
+
+		// Get new_i into r13d
+		mov edi, r8d
+		mov esi, r9d
+		mov eax, [rbp - 32]
+		call c2i
+
+		mov r13d, eax
+
+		// Calculate new_image[new_i]
+
+		mov eax, [rbp - 40]
+		mul r11d
+		mov r14d, eax
+
+		mov eax, [rbp - 36]
+		mul r12d
+
+		add eax, r14d
+		mov r15, 3
+		div r15
+
+		add r13, [rbp - 48]
+		mov [r13], al
+		continueHorizontalC:
+
+		add r9d, 1
+		jmp loopHorizontalC
+		
+		exitLoopHorizontalC:
+
+	add r8d, 1
+	jmp loopHorizontalR
+
+exitLoopHorizontal:
 
 	//// open file
 	//mov rdi, [rbp - 24]		// load file name ptr
