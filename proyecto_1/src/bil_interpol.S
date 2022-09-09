@@ -27,9 +27,14 @@ _bil_interpol:
 	// -64 r8 for rows
 	// -72 r9 for columns
 	// -80 r10
-	// -88 Temporarily, return val
+	// -88 r11
+	// -96 r12
+	// -104 r13
+	// -112 r14
+	// -120 r15
+	// -128 Temporarily, return val
 
-	sub rsp, 80
+	sub rsp, 128
 	mov [rbp - 4], ecx
 	mov [rbp - 8], edx
 	mov [rbp - 16], rsi
@@ -38,15 +43,25 @@ _bil_interpol:
 	mov [rbp - 64], r8
 	mov [rbp - 72], r9
 	mov [rbp - 80], r10
+	mov [rbp - 88], r11
+	mov [rbp - 96], r12
+	mov [rbp - 104], r13
+	mov [rbp - 112], r14
+	mov [rbp - 120], r15
+
+	mov r15, 0
+	mov [rbp - 128], r15
 
 	// add twice = mul by 3
-	add edx, edx
-	add edx, edx
+	mov r15d, edx
+	add edx, r15d
+	add edx, r15d
 	sub edx, 2
 	mov [rbp - 28], edx
 
-	add ecx, ecx
-	add ecx, ecx
+	mov r15d, ecx
+	add ecx, r15d
+	add ecx, r15d
 	sub ecx, 2
 	mov [rbp - 32], ecx
 
@@ -73,18 +88,20 @@ loopOriginalsR:
 		call c2i
 
 		add rax, [rbp - 16]
-		mov ecx, [rax]
+		mov cl, [rax]
 
 		// mul * 3
-		add edi, edi 
-		add edi, edi 
-		add esi, esi 
-		add esi, esi 
+		mov r15d, edi
+		add edi, r15d
+		add edi, r15d
+		mov r15d, esi
+		add esi, r15d
+		add esi, r15d
 		mov eax, [rbp - 32] // get new_w
 		call c2i
 		add rax, [rbp - 48]
 
-		mov [rax], ecx
+		mov [rax], cl
 
 		add r9d, 1
 		jmp loopOriginalsC
@@ -95,6 +112,93 @@ loopOriginalsR:
 	jmp loopOriginalsR
 
 exitLoopOriginals:
+
+
+	mov r8d, 0
+loopVerticalR:
+	cmp r8d, [rbp - 28]
+	jge exitLoopVertical // if r8 >= height, jump 
+
+	mov r9d, 0
+	loopVerticalC:
+		cmp r9d, [rbp - 4]
+		jge exitLoopVerticalC
+
+
+		mov edx, 0
+		mov eax, r9d
+		mov r15, 3
+		div r15
+
+		mov [rbp - 36], edx
+
+		// if mod == 0: continue
+		test edx, edx
+		jz continueVerticalC
+
+		neg edx
+		add edx, 3
+		mov [rbp - 40], edx
+
+		// r10d = new_r//3
+		mov r10d, eax
+
+		// Get up_ref into r11d
+		mov edi, eax
+		mov esi, r8d
+		mov eax, [rbp - 4]
+		call c2i
+
+		add rax, [rbp - 16]
+		mov r11d, [rax]
+
+		// Get down_ref into r12d
+		add r10d, 1
+		mov edi, r10d
+		mov esi, r8d
+		mov eax, [rbp - 4]
+		call c2i
+
+		add rax, [rbp - 16]
+		mov r12d, [rax]
+
+		// Get new_i into r13d
+		sub r10d, 1
+		mov edi, r10d
+		mov esi, r8d
+		add esi, r8d
+		add esi, r8d
+		mov eax, [rbp - 32]
+		call c2i
+
+		mov r13d, eax
+
+		// Calculate new_image[new_i]
+
+		mov eax, [rbp - 40]
+		mul r11d
+		mov r14d, eax
+
+		mov eax, [rbp - 36]
+		mul r12d
+
+		add eax, r14d
+		mov r15, 3
+		div r15
+
+		add r13, [rbp - 48]
+		mov [r13], al
+		continueVerticalC:
+
+		add r9d, 1
+		jmp loopVerticalC
+		
+		exitLoopVerticalC:
+
+	add r8d, 1
+	jmp loopVerticalR
+
+exitLoopVertical:
 
 	//// open file
 	//mov rdi, [rbp - 24]		// load file name ptr
@@ -116,12 +220,17 @@ exitLoopOriginals:
 	// Restore callee-saved registers
 	mov rdi, [rbp - 24]
 	mov rsi, [rbp - 16]
+
 	mov r8 , [rbp - 64]
 	mov r9 , [rbp - 72]
 	mov r10, [rbp - 80]
+	mov r11, [rbp - 88]
+	mov r12, [rbp - 96]
+	mov r13, [rbp - 104]
+	mov r14, [rbp - 112]
+	mov r15, [rbp - 120]
 
-	mov rax, 0
-	//mov rax, [rbp - 88]
+	mov rax, [rbp - 128]
 	leave    
 	ret
 
