@@ -82,8 +82,8 @@ loopOriginalsR:
 		cmp r9d, [rbp - 4]
 		jge exitLoopOriginalsC
 
-		mov edi, r9d
-		mov esi, r8d
+		mov edi, r8d
+		mov esi, r9d
 		mov eax, [rbp - 4]
 		call c2i
 
@@ -125,6 +125,7 @@ loopVerticalR:
 		jge exitLoopVerticalC
 
 
+		// get mod
 		mov edx, 0
 		mov eax, r8d
 		mov r15, 3
@@ -175,12 +176,13 @@ loopVerticalR:
 		// Calculate new_image[new_i]
 
 		mov eax, [rbp - 40]
-		mul r11d
+		mul r11b
 		mov r14d, eax
 
 		mov eax, [rbp - 36]
-		mul r12d
+		mul r12b
 
+		mov edx, 0
 		add eax, r14d
 		mov r15, 3
 		div r15
@@ -261,11 +263,11 @@ loopHorizontalR:
 		// Calculate new_image[new_i]
 
 		mov eax, [rbp - 40]
-		mul r11d
+		mul r11b
 		mov r14d, eax
 
 		mov eax, [rbp - 36]
-		mul r12d
+		mul r12b
 
 		add eax, r14d
 		mov r15, 3
