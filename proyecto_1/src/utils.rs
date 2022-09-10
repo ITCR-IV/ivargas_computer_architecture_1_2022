@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use image::GrayImage;
+use image::{GrayImage, ImageBuffer, Pixel};
 
 /// Transforms GrayImage into a Vec<u32> with ARGB format
 pub fn gray_to_vec32(img: GrayImage) -> Vec<u32> {
@@ -47,8 +47,23 @@ pub fn check_grid(x: f64, y: f64, width: u32, height: u32, n: u32) -> u32 {
     let width_nth: f64 = width as f64 / n64;
     let height_nth: f64 = height as f64 / n64;
 
-    let x: u32 = (x / width_nth).floor() as u32 + 1;
+    let x: u32 = (x / width_nth).floor() as u32;
     let y: u32 = (y / height_nth).floor() as u32 * n;
 
     x + y
+}
+
+pub fn cut_image(img: &GrayImage, x1: u32, y1: u32, x2: u32, y2: u32) -> GrayImage {
+    let cut_pixels: Vec<u8> = img
+        .enumerate_pixels()
+        .filter_map(|(x, y, pixel)| {
+            if (x > x1 && x < x2) && (y > y1 && y < y2) {
+                Some(pixel.channels()[0])
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    ImageBuffer::from_vec(x2 - x1 - 1, y2 - y1 - 1, cut_pixels).unwrap()
 }
