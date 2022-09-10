@@ -146,7 +146,7 @@ fn handle_input(
             let x: u32 = ((square % context.args.n) as f64 * square_width).round() as u32;
             let y: u32 = ((square / context.args.n) as f64 * square_height).round() as u32;
             let cut_image =
-                utils::cut_image(img, x, y, x + square_width as u32, y + square_width as u32);
+                utils::cut_image(img, x, y, x + square_width as u32, y + square_height as u32);
 
             interpolation::bil_interpol(
                 &context.args.intermediate,
