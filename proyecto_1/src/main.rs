@@ -23,7 +23,7 @@ struct Args {
     #[clap(short)]
     input: String,
 
-    /// Save grayscale
+    /// Save grayscale version of input image
     #[clap(short)]
     gray: Option<String>,
 
