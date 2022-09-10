@@ -3,5 +3,7 @@ inherits = "dev"
 opt-level = 2
 
 [alias]
-rf =  "run --profile=dev-faster"
-rr =  "run --release"
+def = "run --profile=dev-faster -- -i input.jpg -g input.png -m result.img -o result.png"
+bf =  "build --profile=dev-faster"
+rf =  "run --profile=dev-faster -- "
+rr =  "run --release -- "
