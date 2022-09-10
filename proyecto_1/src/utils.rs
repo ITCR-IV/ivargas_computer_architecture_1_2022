@@ -4,7 +4,7 @@ use image::{GrayImage, ImageBuffer, Pixel};
 /// Transforms GrayImage into a Vec<u32> with ARGB format
 pub fn gray_to_vec32(img: GrayImage) -> Vec<u32> {
     img.as_raw()
-        .into_iter()
+        .iter()
         .map(|luma| {
             let luma = *luma as u32;
             luma | luma << 8 | luma << 16
@@ -24,7 +24,7 @@ pub fn draw_grid(buffer: Vec<u32>, width: u32, height: u32, n: u32) -> Result<Ve
     let width_nth: f64 = width as f64 / n;
     let height_nth: f64 = height as f64 / n;
     Ok(buffer
-        .into_iter()
+        .iter()
         .enumerate()
         .map(|(i, pixel)| {
             let y: f64 = (i / (width as usize)) as f64;
@@ -35,7 +35,7 @@ pub fn draw_grid(buffer: Vec<u32>, width: u32, height: u32, n: u32) -> Result<Ve
             {
                 return 0x00ff0000;
             };
-            pixel
+            *pixel
         })
         .collect())
 }
