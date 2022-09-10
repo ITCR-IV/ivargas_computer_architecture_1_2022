@@ -1,4 +1,5 @@
 use anyhow::Result;
+use clap::Parser;
 use image::{
     imageops::{colorops::grayscale, resize, FilterType},
     io::Reader as ImageReader,
@@ -19,12 +20,37 @@ const IMAGE: &str = "input.jpg";
 const RESULT: &str = "result.img";
 const N: u32 = 4;
 
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// Input image to use
+    #[clap(short)]
+    input: String,
+
+    /// Save grayscale
+    #[clap(short)]
+    gray: Option<String>,
+
+    /// Interpolated section output if not specified won't be saved
+    #[clap(short)]
+    output: Option<String>,
+
+    #[clap(short = 'm', default_value = "result.img")]
+    intermediate: String,
+
+    /// divide into n^2 squares
+    #[clap(short, default_value_t = 4)]
+    n: u8,
+}
+
 enum ImageState {
     BeforeSelection(GrayImage),
     AfterSelection(GrayImage),
 }
 
 fn main() -> Result<()> {
+    let _args = Args::parse();
+
     let gray_img: GrayImage = grayscale(&ImageReader::open(IMAGE)?.decode()?);
     gray_img.save("input.png").unwrap();
 
@@ -40,14 +66,14 @@ fn main() -> Result<()> {
     event_loop.run(move |event, _, control_flow| {
         control_flow.set_wait();
 
-        let (width, height) = {
+        let (win_width, win_height) = {
             let size = graphics_context.window().inner_size();
             (size.width, size.height)
         };
 
         match event {
             Event::RedrawRequested(window_id) if window_id == graphics_context.window().id() => {
-                handle_redraw(&mut graphics_context, &img_state, height, width);
+                handle_redraw(&mut graphics_context, &img_state, win_height, win_width);
             }
 
             Event::WindowEvent { event, window_id }
@@ -62,8 +88,8 @@ fn main() -> Result<()> {
                         &graphics_context,
                         &mut img_state,
                         mouse_pos,
-                        height,
-                        width,
+                        win_height,
+                        win_width,
                         state,
                         button,
                     ),
