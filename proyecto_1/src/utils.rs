@@ -60,7 +60,7 @@ pub fn cut_image(img: &GrayImage, x1: u32, y1: u32, x2: u32, y2: u32) -> GrayIma
         .filter_map(|(x, y, pixel)| {
             // Range has to be exclusive on the "[xy]2" or else when creating the ImageBuffer it'll
             // crash if squares on right-most or down-most edges are selected
-            if (x > x1 && x < x2) && (y > y1 && y < y2) {
+            if (x >= x1 && x < x2) && (y >= y1 && y < y2) {
                 Some(pixel.channels()[0])
             } else {
                 None
@@ -68,5 +68,5 @@ pub fn cut_image(img: &GrayImage, x1: u32, y1: u32, x2: u32, y2: u32) -> GrayIma
         })
         .collect();
 
-    ImageBuffer::from_vec(x2 - x1 - 1, y2 - y1 - 1, cut_pixels).unwrap()
+    ImageBuffer::from_vec(x2 - x1, y2 - y1, cut_pixels).unwrap()
 }
