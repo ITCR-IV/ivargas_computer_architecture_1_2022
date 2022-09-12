@@ -31,6 +31,7 @@ struct Args {
     #[clap(short)]
     output: Option<String>,
 
+    /// Name of intermediate file that is saved by assembly interpolator to be read by program
     #[clap(short = 'm', default_value = "result.img")]
     intermediate: String,
 
@@ -39,11 +40,13 @@ struct Args {
     n: u32,
 }
 
+/// To handle the current state of the program while holding relevant data
 enum ImageState {
     BeforeSelection(GrayImage),
     AfterSelection(GrayImage),
 }
 
+/// Context object to easily pass all necessary program state to functions
 struct Context {
     args: Args,
     graphics_context: GraphicsContext<Window>,
@@ -101,6 +104,7 @@ fn main() -> Result<()> {
     });
 }
 
+/// For handling the Event::RedrawRequested in the main program loop
 fn handle_redraw(context: &mut Context, win_height: u32, win_width: u32) {
     match &context.img_state {
         ImageState::BeforeSelection(img) => {
@@ -124,6 +128,7 @@ fn handle_redraw(context: &mut Context, win_height: u32, win_width: u32) {
     }
 }
 
+/// For handling the Event::WindowEvent::MouseInput in the main program loop
 fn handle_input(
     context: &mut Context,
     win_height: u32,
